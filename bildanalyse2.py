@@ -73,20 +73,19 @@ if uploaded_file:
         key="canvas",
     )
 
-    # 🖍️ Polygon-Maske anwenden
     # 🧭 Bildgröße auslesen
-width, height = img_rgb.size
+    width, height = img_rgb.size
 
-st.subheader("🔍 Bereich im Bild manuell auswählen")
+    st.subheader("🔍 Bereich im Bild manuell auswählen")
 
-x_start = st.slider("Start-X", 0, width - 1, 0)
-x_end = st.slider("End-X", x_start + 1, width, width)
-y_start = st.slider("Start-Y", 0, height - 1, 0)
-y_end = st.slider("End-Y", y_start + 1, height, height)
+    x_start = st.slider("Start-X", 0, width - 1, 0)
+    x_end = st.slider("End-X", x_start + 1, width, width)
+    y_start = st.slider("Start-Y", 0, height - 1, 0)
+    y_end = st.slider("End-Y", y_start + 1, height, height)
 
-# ✂️ Bildbereich zuschneiden
-img_array = np.array(img_gray)
-cropped_array = img_array[y_start:y_end, x_start:x_end]
+    # ✂️ Bildbereich zuschneiden
+    img_array = np.array(img_gray)
+    cropped_array = img_array[y_start:y_end, x_start:x_end]
 
     # 🎯 Button zur Schwellenwertsuche
     if st.button("🎯 Beste Intensitäts-Schwelle suchen"):
