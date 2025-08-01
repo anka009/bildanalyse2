@@ -74,20 +74,23 @@ if uploaded_file:
     )
 
     # 🖍️ Polygon-Maske anwenden
-    img_array = np.array(img_gray)
-    if canvas_result.json_data and "objects" in canvas_result.json_data:
-        obj = canvas_result.json_data["objects"]
-        if obj and obj[0]["type"] == "polygon":
-            punkte = [(p["x"], p["y"]) for p in obj[0]["points"]]
-            maske = Image.new("L", img_rgb.size, 0)
-            draw_mask = ImageDraw.Draw(maske)
-            draw_mask.polygon(punkte, fill=255)
-            masked = Image.composite(Image.fromarray(img_array), Image.new("L", img_rgb.size, 0), maske)
-            img_array = np.array(masked)
+    # 🧭 Bildgröße auslesen
+width, height = img_rgb.size
+
+st.subheader("🔍 Bereich im Bild manuell auswählen")
+
+x_start = st.slider("Start-X", 0, width - 1, 0)
+x_end = st.slider("End-X", x_start + 1, width, width)
+y_start = st.slider("Start-Y", 0, height - 1, 0)
+y_end = st.slider("End-Y", y_start + 1, height, height)
+
+# ✂️ Bildbereich zuschneiden
+img_array = np.array(img_gray)
+cropped_array = img_array[y_start:y_end, x_start:x_end]
 
     # 🎯 Button zur Schwellenwertsuche
     if st.button("🎯 Beste Intensitäts-Schwelle suchen"):
-        bester_wert, max_anzahl = berechne_beste_schwelle(img_array, min_area, max_area, group_diameter)
+        bester_wert, max_anzahl = berechne_beste_schwelle(cropped_array, min_area, max_area, group_diameter)
         st.session_state.intensity = bester_wert
         st.success(f"Empfohlene Schwelle: {bester_wert} → {max_anzahl} Gruppen erkannt")
 
@@ -95,7 +98,7 @@ if uploaded_file:
     intensity_threshold = st.slider("Intensitäts-Schwelle", 0, 255, value=st.session_state.intensity)
 
     # 🔍 Fleckenerkennung
-    mask = img_array < intensity_threshold
+    mask = cropped_array < intensity_threshold
     labeled_array, _ = label(mask)
     objects = find_objects(labeled_array)
 
