@@ -2,7 +2,6 @@ import streamlit as st
 from PIL import Image, ImageDraw
 import numpy as np
 from scipy.ndimage import label, find_objects
-from streamlit_drawable_canvas import st_canvas
 
 # 🧠 Hilfsfunktion zur Schwellenwert-Berechnung
 def berechne_beste_schwelle(img_array, min_area, max_area, group_diameter):
@@ -59,25 +58,10 @@ if uploaded_file:
     img_rgb = Image.open(uploaded_file).convert("RGB")
     img_gray = img_rgb.convert("L")
 
-    st.subheader("🎯 Polygon zeichnen zum Beschneiden")
-    canvas_result = st_canvas(
-        fill_color="rgba(255, 255, 255, 0.3)",
-        stroke_width=2,
-        stroke_color="#0000FF",
-        background_image=img_rgb,
-        update_streamlit=True,
-        height=img_rgb.height,
-        width=img_rgb.width,
-        drawing_mode="polygon",
-        point_display_radius=3,
-        key="canvas",
-    )
-
     # 🧭 Bildgröße auslesen
     width, height = img_rgb.size
 
     st.subheader("🔍 Bereich im Bild manuell auswählen")
-
     x_start = st.slider("Start-X", 0, width - 1, 0)
     x_end = st.slider("End-X", x_start + 1, width, width)
     y_start = st.slider("Start-Y", 0, height - 1, 0)
