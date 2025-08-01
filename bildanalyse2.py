@@ -67,6 +67,7 @@ if modus == "Fleckengruppen":
                     gruppe.append((x2, y2))
                     visited.add(j)
             grouped.append(gruppe)
+        st.success(f"📍 Erkannte Fleckengruppen: {len(grouped)}")
 
         draw_img = img_rgb.copy()
         draw = ImageDraw.Draw(draw_img)
