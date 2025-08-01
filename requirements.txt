@@ -4,3 +4,4 @@ matplotlib
 Pillow
 scipy
 streamlit-drawable-canvas
+upgrade streamlit-drawable-canvas
