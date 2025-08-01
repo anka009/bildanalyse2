@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image, ImageDraw
 import numpy as np
 from scipy.ndimage import label, find_objects
+from io import BytesIO
 
 # 📄 Seiteneinstellungen
 st.set_page_config(page_title="Bildanalyse Komfort-App", layout="wide")
@@ -26,7 +27,7 @@ circle_width = st.sidebar.slider("🖊️ Liniendicke", 1, 10, 6)
 # ▓▓▓ MODUS 1: Fleckengruppen ▓▓▓
 if modus == "Fleckengruppen":
     st.subheader("🧠 Fleckengruppen erkennen")
-    col1, col2 = st.columns([1, 2])  # Layout-Einstellung
+    col1, col2 = st.columns([1, 2])
 
     with col1:
         st.markdown("### 🔧 Fleckengruppen-Einstellungen")
@@ -62,12 +63,11 @@ if modus == "Fleckengruppen":
             for j, (x2, y2) in enumerate(centers):
                 if j in visited:
                     continue
-                if ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5 <= group_diameter / 2:
+                if ((x1 - x2)**2 + (y1 - y2)**2)**0.5 <= group_diameter / 2:
                     gruppe.append((x2, y2))
                     visited.add(j)
             grouped.append(gruppe)
 
-        # 🖼️ Bild zeichnen
         draw_img = img_rgb.copy()
         draw = ImageDraw.Draw(draw_img)
         for gruppe in grouped:
@@ -81,12 +81,11 @@ if modus == "Fleckengruppen":
                     outline=circle_color,
                     width=circle_width
                 )
-
         st.image(draw_img, caption="🖼️ Fleckengruppen-Vorschau", use_column_width=True)
+
 # ▓▓▓ MODUS 2: Kreis-Ausschnitt ▓▓▓
 elif modus == "Kreis-Ausschnitt":
     st.subheader("🎯 Kreis-Ausschnitt wählen")
-
     col1, col2 = st.columns([1, 2])
 
     with col1:
@@ -96,43 +95,16 @@ elif modus == "Kreis-Ausschnitt":
         radius = st.slider("🔵 Radius", 10, min(w, h) // 2, 100)
 
     with col2:
-        # Kopiere das Bild und zeichne den Kreis
         draw_img = img_rgb.copy()
         draw = ImageDraw.Draw(draw_img)
-
         draw.ellipse(
             [(center_x - radius, center_y - radius), (center_x + radius, center_y + radius)],
             outline=circle_color,
             width=circle_width
         )
-
         st.image(draw_img, caption="🖼️ Kreis-Vorschau", use_column_width=True)
 
-        # Optional: Bild innerhalb des Kreises ausschneiden
         if st.checkbox("🎬 Nur Ausschnitt anzeigen"):
-            # Ausschnitt erzeugen
-            mask = Image.new("L", (w, h), 0)
-            mask_draw = ImageDraw.Draw(mask)
-            mask_draw.ellipse(
-                [(center_x - radius, center_y - radius), (center_x + radius, center_y + radius)],
-                fill=255
-            )
-    cropped = Image.composite(img_rgb, Image.new("RGB", img_rgb.size, (255, 255, 255)), mask)
-    st.image(cropped, caption="🧩 Kreis-Ausschnitt", use_column_width=True)
-
-    # Download-Button
-    from io import BytesIO
-    buf = BytesIO()
-    cropped.save(buf, format="PNG")
-    byte_im = buf.getvalue()
-    st.download_button(
-        label="📥 Kreis-Ausschnitt herunterladen",
-        data=byte_im,
-        file_name="kreis_ausschnitt.png",
-        mime="image/png"
-    )
-
-
             mask = Image.new("L", (w, h), 0)
             mask_draw = ImageDraw.Draw(mask)
             mask_draw.ellipse(
@@ -141,3 +113,13 @@ elif modus == "Kreis-Ausschnitt":
             )
             cropped = Image.composite(img_rgb, Image.new("RGB", img_rgb.size, (255, 255, 255)), mask)
             st.image(cropped, caption="🧩 Kreis-Ausschnitt", use_column_width=True)
+
+            buf = BytesIO()
+            cropped.save(buf, format="PNG")
+            byte_im = buf.getvalue()
+            st.download_button(
+                label="📥 Kreis-Ausschnitt herunterladen",
+                data=byte_im,
+                file_name="kreis_ausschnitt.png",
+                mime="image/png"
+            )
