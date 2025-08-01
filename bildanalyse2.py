@@ -27,7 +27,7 @@ circle_width = st.sidebar.slider("🖊️ Liniendicke", 1, 10, 6)
 # ▓▓▓ MODUS 1: Fleckengruppen ▓▓▓
 if modus == "Fleckengruppen":
     st.subheader("🧠 Fleckengruppen erkennen")
-
+    
     x_start = st.slider("Start-X", 0, w - 1, 0)
     x_end = st.slider("End-X", x_start + 1, w, w)
     y_start = st.slider("Start-Y", 0, h - 1, 0)
