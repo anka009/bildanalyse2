@@ -5,3 +5,4 @@ Pillow
 scipy
 streamlit-drawable-canvas
 opencv-python
+scikit-image
