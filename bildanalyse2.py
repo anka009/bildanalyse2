@@ -3,17 +3,15 @@ from PIL import Image, ImageDraw
 import numpy as np
 from streamlit_drawable_canvas import st_canvas
 
-# Breites Layout
 st.set_page_config(page_title="🔍 Kreis-Radar", layout="wide")
 st.title("🛰️ Kreis-Radar Komfort-App")
 
-# Sidebar: Bild & Einstellungen
-uploaded_file = st.sidebar.file_uploader("📁 Bild auswählen", type=["png", "jpg", "jpeg"])
+# Sidebar: Upload & Parameter
+uploaded_file = st.sidebar.file_uploader("📁 Bild hochladen", type=["jpg", "jpeg", "png"])
 if not uploaded_file:
     st.warning("Bitte lade ein Bild hoch 🖼️")
     st.stop()
 
-# Sidebar: Parameter
 circle_color = st.sidebar.color_picker("🎨 Kreisfarbe", "#FF0000")
 circle_width = st.sidebar.slider("🖌️ Liniendicke", 1, 10, 3)
 analyse_farbe = st.sidebar.selectbox("🎯 Analyse-Farbe", ["Rot", "Grün", "Blau"])
@@ -21,20 +19,19 @@ min_intens = st.sidebar.slider("🔬 Min. Farbintensität", 0, 255, 150)
 
 # Bild vorbereiten
 img = Image.open(uploaded_file).convert("RGB")
-w, h = img.size
 img_array = np.array(img)
+w, h = img.size
 
-# Spalten-Layout
+# Spaltenlayout
 col_canvas, col_analysis = st.columns([2, 1])
 
-# ▶️ Mausgesteuerte Kreiseingabe
 with col_canvas:
-    st.subheader("🖱️ Kreis zeichnen (Maus)")
+    st.subheader("🖱️ Zeichne einen Kreis")
     canvas_result = st_canvas(
         fill_color="rgba(0,0,0,0)",
         stroke_width=circle_width,
         stroke_color=circle_color,
-        background_image=img_array,  # ✅ FIX: korrekt als NumPy-Array
+        background_image=img_array,  # ✅ FIX: korrektes Format
         update_streamlit=True,
         height=h,
         width=w,
@@ -42,14 +39,13 @@ with col_canvas:
         key="canvas"
     )
 
-# Auswertung nur wenn Kreis gezeichnet wurde
 if canvas_result.json_data and canvas_result.json_data["objects"]:
     obj = canvas_result.json_data["objects"][0]
     cx = int(obj["left"] + obj["radius"])
     cy = int(obj["top"] + obj["radius"])
     r = int(obj["radius"])
 
-    # Maske im Kreisbereich
+    # Maske erstellen
     mask = Image.new("L", (w, h), 0)
     draw = ImageDraw.Draw(mask)
     draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)], fill=255)
@@ -69,7 +65,7 @@ if canvas_result.json_data and canvas_result.json_data["objects"]:
         st.write(f"• Farbkanal: **{analyse_farbe}**")
         st.write(f"• Anteil intensiver Pixel: **{anteil:.1f}%**")
 
-        # Vorschau des Ausschnitts
+        # Ausschnitt anzeigen
         result = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         result.paste(img.convert("RGBA"), mask=mask)
         bbox = mask.getbbox()
@@ -78,4 +74,4 @@ if canvas_result.json_data and canvas_result.json_data["objects"]:
 
 else:
     with col_analysis:
-        st.info("🔍 Zeichne zuerst einen Kreis mit der Maus, um Analyse zu starten.")
+        st.info("⚡ Zeichne einen Kreis im Bild, um ihn auszuschneiden und zu analysieren.")
