@@ -22,7 +22,7 @@ modus = st.sidebar.radio("Analyse-Modus wählen", ["Fleckengruppen", "Kreis-Auss
 
 # 🎯 Gemeinsame Parameter
 circle_color = st.sidebar.color_picker("🎨 Kreisfarbe", "#FF0000")
-circle_width = st.sidebar.slider("🖊️ Liniendicke", 1, 10, 4)
+circle_width = st.sidebar.slider("🖊️ Liniendicke", 1, 10, 6)
 
 # ▓▓▓ MODUS 1: Fleckengruppen ▓▓▓
 if modus == "Fleckengruppen":
@@ -34,9 +34,9 @@ if modus == "Fleckengruppen":
     y_end = st.slider("End-Y", y_start + 1, h, h)
     cropped_array = img_array[y_start:y_end, x_start:x_end]
 
-    min_area = st.slider("Minimale Fleckengröße", 10, 500, 50)
-    max_area = st.slider("Maximale Fleckengröße", min_area, 1000, 500)
-    group_diameter = st.slider("Gruppendurchmesser", 20, 500, 150)
+    min_area = st.slider("Minimale Fleckengröße", 10, 500, 30)
+    max_area = st.slider("Maximale Fleckengröße", min_area, 1000, 250)
+    group_diameter = st.slider("Gruppendurchmesser", 20, 500, 60)
 
     if "intensity" not in st.session_state:
         st.session_state.intensity = 135
