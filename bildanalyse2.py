@@ -110,13 +110,13 @@ elif modus == "Kreis-Ausschnitt":
 
         # Optional: Bild innerhalb des Kreises ausschneiden
         if st.checkbox("🎬 Nur Ausschnitt anzeigen"):
-    # Ausschnitt erzeugen
-    mask = Image.new("L", (w, h), 0)
-    mask_draw = ImageDraw.Draw(mask)
-    mask_draw.ellipse(
-        [(center_x - radius, center_y - radius), (center_x + radius, center_y + radius)],
-        fill=255
-    )
+            # Ausschnitt erzeugen
+            mask = Image.new("L", (w, h), 0)
+            mask_draw = ImageDraw.Draw(mask)
+            mask_draw.ellipse(
+                [(center_x - radius, center_y - radius), (center_x + radius, center_y + radius)],
+                fill=255
+            )
     cropped = Image.composite(img_rgb, Image.new("RGB", img_rgb.size, (255, 255, 255)), mask)
     st.image(cropped, caption="🧩 Kreis-Ausschnitt", use_column_width=True)
 
